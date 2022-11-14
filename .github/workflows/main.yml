@@ -6,7 +6,12 @@ name: DevOps Pipeline
 # FTP_SERVER servidor de hostinger
 # FTP_USERNAME usuario de ftp de hostinger
 # FTP_PASSWORD contraseña del usuario de ftp
-# Deploy staging hay que agregar la URL de la web de staging Ej: https://example.com , la URL sin comillas debe ir
+# DATABASE_HOST es el servidor de la base de datos
+# DATABASE_PORT es el puerto de la base de datos que por defecto es 3306
+# DATABASE_NAME es el nombre de la base de datos
+# DATABASE_USERNAME es el nombre de usuario de la base de datos
+# DATABASE_PASSWORD es la clave del usuario de la base de datos
+# DATABASE_SCRIPT es el nombre del script.sql que se debera subir en el codigo para poder importar la base de datos
 # Author: Gaston Barbaccia
 
 on:
@@ -119,6 +124,22 @@ jobs:
           name: Depcheck report
           path: ${{github.workspace}}/reports
 
+  Import_SQL:
+    runs-on: ubuntu-latest
+    name: MySQL Deploy Action
+    needs: [sonarcloud,dependency_check]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: gtadam/mysql-deploy-action@v1
+        with:
+            DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+            DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+            DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+            DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+            DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+            DATABASE_SCRIPT: ${{ secrets.DATABASE_SCRIPT }}
+
   Deploy_staging:
     name: Deploy Staging
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
@@ -126,7 +147,7 @@ jobs:
     environment: 
       name: staging
       url: https://example.com
-    needs: [sonarcloud,dependency_check]
+    needs: [Import_SQL]
     steps:
       - uses: actions/checkout@v2
       - name: Upload ftp
