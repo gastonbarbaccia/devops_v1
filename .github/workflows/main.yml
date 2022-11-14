@@ -1,4 +1,4 @@
-name: DevSecOps Pipeline
+name: DevOps Pipeline
 
 # Crear las siguientes variables como secrets dentro del settings del proyecto
 # GITHUB_TOKEN es un token de github que se puede crear con otro nombre de ser necesario, recordar colocar el nombre en el main.yml
