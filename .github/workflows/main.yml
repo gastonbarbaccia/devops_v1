@@ -67,6 +67,7 @@ jobs:
       - uses: php-actions/phpstan@v3
         with:
           path: "src/"
+          memory_limit: 256M
 
   php_lint:
     name: PHP Lint
